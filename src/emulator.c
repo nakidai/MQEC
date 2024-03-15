@@ -83,9 +83,7 @@ void emulator_read_instructions(void)
 {
     if (pc.flags & EMULATOR_VERBOSE) fputs("Loading the instructions...\n", stderr);
 
-    i32 size;
-
-    i32 high, low;
+    i32 size, high, low;
     FILE *file = fopen(pc.filename, "r");
     if (errno) error();
         fseek(file, 0, SEEK_END);
@@ -104,28 +102,25 @@ void emulator_read_instructions(void)
         for (u16 i = 0; i < MEM_SIZE; ++i)
         {
             if ((high = fgetc(file)) == -1 || (low = fgetc(file)) == -1)
+            {
                 if (errno)
+                {
+                    fclose(file);
                     error();
+                }
                 else
+                {
                     break;
+                }
+            }
             pc.m_rom[i] = (high << 8) + low;
             if (pc.flags & EMULATOR_VERBOSE)
-            {
-                if (pc.m_rom[i] & I_FLAG)
-                    fprintf(
-                        stderr,
-                        "%s $0x%02X\n",
-                        strinstruction(pc.m_rom[i] & I_OPCODE),
-                        (pc.m_rom[i] & I_ARG) >> I_ARG_OFF
-                    );
-                else
-                    fprintf(
-                        stderr,
-                        "%s  0x%02X\n",
-                        strinstruction(pc.m_rom[i] & I_OPCODE),
-                        (pc.m_rom[i] & I_ARG) >> I_ARG_OFF
-                    );
-            }
+                fprintf(
+                    stderr,
+                    (pc.m_rom[i] & I_FLAG) ? "%s $0x%02X\n" : "%s  0x%02X\n",
+                    strinstruction(pc.m_rom[i] & I_OPCODE),
+                    (pc.m_rom[i] & I_ARG) >> I_ARG_OFF
+                );
         }
     fclose(file);
 }
