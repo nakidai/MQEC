@@ -1,0 +1,4 @@
+mqec
+*.exe
+build
+cmake-build-*
