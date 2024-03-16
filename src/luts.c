@@ -161,8 +161,8 @@ const s8 *emulator_strinstruction(u8 instruction)
     case 113: return "PRR";
     case 126: return "INT";
     case 127: return "HALT";
+    default:  return "UNKN";
     }
-    return "UNKN";
 }
 
 u8 emulator_lut_sin(u8 n)
