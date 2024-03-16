@@ -568,7 +568,7 @@ void emulator_read_instructions(void)
             if (pc.flags & EMULATOR_VERBOSE)
                 fprintf(
                     stderr,
-                    (pc.m_rom[i] & I_FLAG) ? "0x%04X %s $0x%02X\n" : "0x%04X %s  0x%02X\n",
+                    (pc.m_rom[i] & I_FLAG) ? "0x%04X %-4s $0x%02X\n" : "0x%04X %-4s  0x%02X\n",
                     i,
                     emulator_strinstruction(pc.m_rom[i] & I_OPCODE),
                     (pc.m_rom[i] & I_ARG) >> I_ARG_OFF
