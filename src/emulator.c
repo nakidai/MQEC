@@ -588,7 +588,7 @@ void emulator_run(void)
 
     for (;;++pc.ticks)
     {
-        instruction = pc.m_rom[pc.r_pc];
+        instruction = *get_rom(pc.r_pc);
 
         flag   = (instruction & I_FLAG) >> I_FLAG_OFF;
         data   = (instruction & I_ARG) >> I_ARG_OFF;
