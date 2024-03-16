@@ -24,7 +24,7 @@ void usage(bool full)
     if (full)
         die(
             1,
-            "usage: %s [-hvdDp] file\n"
+            "usage: %s [-hldDp] file\n"
             "Executes .mqa files (compiled code for MQ CPU)\n"
             "Arguments:\n"
             "  file              file to execute\n"
