@@ -11,6 +11,7 @@ add_executable(mqec
   src/emulator.c
   src/program.c
   src/luts.c
+  src/instructions.c
 )
 
 set_target_properties(mqec PROPERTIES C_STANDARD 99)
