@@ -44,17 +44,17 @@ typedef struct mq
     u16 r_cp;     /* Cache Page         */
     u16 r_flags;  /* Flags Register     */
 
-    /* Memory        Size Description */
-    u16 *m_rom;   /* 2^16 ROM         */
-    u8  *m_cache; /* 2^16 Cache       */
-    u8  *m_us;    /* 2^8  User Stack  */
-    u8  *m_cs;    /* 2^8  Call Stack  */
-    u8  *m_ports; /* 2^8  I/O Ports   */
+    /* Memory        Length Description */
+    u16 *m_rom;   /* 2^16   ROM         */
+    u8  *m_cache; /* 2^16   Cache       */
+    u8  *m_us;    /* 2^8    User Stack  */
+    u8  *m_cs;    /* 2^8    Call Stack  */
+    u8  *m_ports; /* 2^8    I/O Ports   */
 
     /* Emulator variables    Description*/
     u8          flags;    /* Emulator flags      */
     s8         *filename; /* File being executed */
-    u32         ticks;    /* Ticks executed */
+    u32         ticks;    /* Ticks executed      */
 } mq;
 
 static mq pc = {0};
@@ -492,7 +492,7 @@ void emulator_read_instructions(void)
         fseek(file, 0, SEEK_END);
         size = ftell(file);
         fseek(file, 0, SEEK_SET);
-        if (size > MEM_SIZE)
+        if (size > MEM_SIZE*2)
         {
             fclose(file);
             die(1, "%s: File is larger than MQ can handle\n", program_name);
