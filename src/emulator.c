@@ -600,14 +600,16 @@ void emulator_run(void)
         if (pc.flags & EMULATOR_DEBUG)
             fprintf(
                 stderr,
-                "Instruction: %d|%d|%d(%s)\n"
-                "ACC: %02X PC:  %02X%02X\n"
-                "CS:  %02X US:  %02X\n"
-                "CP:  %02X Bus: %02X\n",
+                "I: %d|%d|%d(%s)\n"
+                "ACC: 0x%02X PC:  0x%02X%02X\n"
+                "CS:  0x%02X US:    0x%02X\n"
+                "CP:  0x%02X Bus:   0x%02X\n"
+                "Flags: 0b%08b\n",
                 flag, data, opcode, emulator_strinstruction(opcode),
                 pc.r_acc, pc.r_rp, pc.r_pc,
                 pc.r_csp, pc.r_usp,
-                pc.r_cp, bus 
+                pc.r_cp, bus,
+                pc.r_flags
             );
         if (pc.flags & EMULATOR_PAUSE)
             getchar();
