@@ -516,8 +516,6 @@ void emulator_init(s8 *filename, u8 flags)
 
     pc.flags    = flags;
     pc.filename = filename;
-
-    printf("%d\n", sizeof(pc) + MEM_SIZE*3 + STACK_SIZE*3 + PORTS);
 }
 
 void emulator_free(void)
