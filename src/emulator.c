@@ -5,10 +5,10 @@
 #include <errno.h>
 #include <ctype.h>
 
-#include "commands.h"
 #include "emulator.h"
 #include "program.h"
 #include "types.h"
+#include "luts.h"
 #include "die.h"
 
 #define MEM_SIZE     65536
@@ -513,6 +513,8 @@ void emulator_init(s8 *filename, u8 flags)
 
     pc.flags    = flags;
     pc.filename = filename;
+
+    printf("%d\n", sizeof(pc) + MEM_SIZE*3 + STACK_SIZE*3 + PORTS);
 }
 
 void emulator_free(void)
