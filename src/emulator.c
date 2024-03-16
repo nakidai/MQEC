@@ -66,123 +66,123 @@ void emulator_finish()
     exit(0);
 }
 
-u8 *get_cache(u8 offset)
+static u8 *get_cache(u8 offset)
 {
     return pc.m_cache + (pc.r_cp << 8) + offset;
 }
 
-u16 *get_rom(u8 offset)
+static u16 *get_rom(u8 offset)
 {
     return pc.m_rom + (pc.r_rp << 8) + offset;
 }
 
-void i_nop(u8 bus) {}
+static void i_nop(u8 bus) {}
 
-void i_lra(u8 bus)
+static void i_lra(u8 bus)
 {
     pc.r_acc = bus;
 }
 
-void i_sra(u8 bus)
+static void i_sra(u8 bus)
 {
     *get_cache(bus) = pc.r_acc;
 }
 
-void i_call(u8 bus)
+static void i_call(u8 bus)
 {
     pc.m_cs[pc.r_csp] = pc.r_pc;
     ++pc.r_csp;
     pc.r_pc = (pc.r_rp << 8) + bus - 1;
 }
 
-void i_ret(u8 bus)
+static void i_ret(u8 bus)
 {
     --pc.r_csp;
     pc.r_pc = pc.m_cs[pc.r_csp] - 1;
 }
 
-void i_jmp(u8 bus)
+static void i_jmp(u8 bus)
 {
     pc.r_pc = (pc.r_rp << 8) + bus - 1;
 }
 
-void i_jmpp(u8 bus)
+static void i_jmpp(u8 bus)
 {
     if (pc.r_acc != 0)
         pc.r_pc = (pc.r_rp << 8) + bus - 1;
 }
 
-void i_jmpz(u8 bus)
+static void i_jmpz(u8 bus)
 {
     if (pc.r_acc == 0)
         pc.r_pc = (pc.r_rp << 8) + bus - 1;
 }
 
-void i_jmpn(u8 bus)
+static void i_jmpn(u8 bus)
 {
     if (pc.r_acc & 0b1000000)
         pc.r_pc = (pc.r_rp << 8) + bus - 1;
 }
 
-void i_jmpc(u8 bus)
+static void i_jmpc(u8 bus)
 {
     if (pc.r_flags & F_CARRY)
         pc.r_pc = (pc.r_rp << 8) + bus - 1;
 }
 
-void i_ccf(u8 bus)
+static void i_ccf(u8 bus)
 {
     pc.r_flags &= ~F_CARRY;
 }
 
-void i_lrp(u8 bus)
+static void i_lrp(u8 bus)
 {
     pc.r_acc = *get_cache(bus);
 }
 
-void i_ccp(u8 bus)
+static void i_ccp(u8 bus)
 {
     pc.r_cp = bus;
 }
 
-void i_crp(u8 bus)
+static void i_crp(u8 bus)
 {
     pc.r_rp = bus;
 }
 
-void i_push(u8 bus)
+static void i_push(u8 bus)
 {
     pc.m_us[pc.r_usp] = pc.r_acc;
     ++pc.r_usp;
 }
 
-void i_pop(u8 bus)
+static void i_pop(u8 bus)
 {
     --pc.r_usp;
     pc.r_acc = pc.m_us[pc.r_usp];
 }
 
-void i_and(u8 bus)
+static void i_and(u8 bus)
 {
     pc.r_acc = pc.r_acc & bus;
 }
 
-void i_or(u8 bus)
+static void i_or(u8 bus)
 {
     pc.r_acc = pc.r_acc | bus;
 }
 
-void i_xor(u8 bus)
+static void i_xor(u8 bus)
 {
     pc.r_acc = pc.r_acc ^ bus;
 }
 
-void i_not(u8 bus)
+static void i_not(u8 bus)
 {
     pc.r_acc = ~pc.r_acc;
 }
 
-void i_lsc(u8 bus)
+static void i_lsc(u8 bus)
 {
     u16 action;
 
@@ -192,7 +192,7 @@ void i_lsc(u8 bus)
     pc.r_acc = action & 255;
 }
 
-void i_rsc(u8 bus)
+static void i_rsc(u8 bus)
 {
     u8 t = pc.r_acc;
     pc.r_acc = (pc.r_acc >> bus) + (((pc.r_flags & F_CARRY) >> F_CARRY_OFF) << 7);
@@ -200,7 +200,7 @@ void i_rsc(u8 bus)
         pc.r_flags |= F_CARRY;
 }
 
-void i_cmp(u8 bus)
+static void i_cmp(u8 bus)
 {
     u8 negative = (pc.r_acc & 0b10000000) & (bus & 0b10000000);
 
@@ -215,7 +215,7 @@ void i_cmp(u8 bus)
         pc.r_acc = ~pc.r_acc;
 }
 
-void i_cmpu(u8 bus)
+static void i_cmpu(u8 bus)
 {
     if (pc.r_acc > bus)
         pc.r_acc = 1;
@@ -225,7 +225,7 @@ void i_cmpu(u8 bus)
         pc.r_acc = 255;
 }
 
-void i_adc(u8 bus)
+static void i_adc(u8 bus)
 {
     u16 action = pc.r_acc + bus + ((pc.r_flags & F_CARRY) >> F_CARRY_OFF);
 
@@ -234,7 +234,7 @@ void i_adc(u8 bus)
     pc.r_acc = action & 255;
 }
 
-void i_sbc(u8 bus)
+static void i_sbc(u8 bus)
 {
     u16 action = pc.r_acc - bus - ((pc.r_flags & F_CARRY) >> F_CARRY_OFF);
 
@@ -243,52 +243,52 @@ void i_sbc(u8 bus)
     pc.r_acc = action & 255;
 }
 
-void i_inc(u8 bus)
+static void i_inc(u8 bus)
 {
     ++pc.r_acc;
     if (pc.r_acc == 0)
         pc.r_flags |= F_CARRY;
 }
 
-void i_dec(u8 bus)
+static void i_dec(u8 bus)
 {
     --pc.r_acc;
     if (pc.r_acc == 255)
         pc.r_flags |= F_CARRY;
 }
 
-void i_abs(u8 bus)
+static void i_abs(u8 bus)
 {
     if (pc.r_acc & 0b10000000)
         pc.r_acc = ~pc.r_acc + 1;
 }
 
-void i_mul(u8 bus)
+static void i_mul(u8 bus)
 {
     pc.r_acc *= bus;
 }
 
-void i_div(u8 bus)
+static void i_div(u8 bus)
 {
     pc.r_acc /= bus;
 }
 
-void i_mod(u8 bus)
+static void i_mod(u8 bus)
 {
     pc.r_acc %= bus;
 }
 
-void i_tse(u8 bus)
+static void i_tse(u8 bus)
 {
     pc.r_acc = emulator_lut_sin(bus);
 }
 
-void i_tce(u8 bus)
+static void i_tce(u8 bus)
 {
     pc.r_acc = emulator_lut_cos(bus);
 }
 
-void i_add(u8 bus)
+static void i_add(u8 bus)
 {
     u16 action = pc.r_acc + bus;
 
@@ -297,7 +297,7 @@ void i_add(u8 bus)
     pc.r_acc = action & 255;
 }
 
-void i_sub(u8 bus)
+static void i_sub(u8 bus)
 {
     u16 action = pc.r_acc - bus;
 
@@ -306,24 +306,21 @@ void i_sub(u8 bus)
     pc.r_acc = action & 255;
 }
 
-void i_rpl(u8 bus)
+static void i_rpl(u8 bus)
 {
     pc.r_acc = emulator_lut_rpl(bus);
 }
 
-void i_mulh(u8 bus)
+static void i_mulh(u8 bus)
 {
     u16 action = pc.r_acc * bus;
     pc.r_acc = (action & 0b1111111100000000) >> 8;
 }
 
-void i_ui(u8 bus)
+static void i_ui(u8 bus)
 {
     s8 input[8] = {0};
     bool is_number = true;
-
-    if (pc.flags & EMULATOR_DEPRECATED)
-        fprintf(stderr, "Deprecated UI at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
 
     if (fgets(input, 8, stdin) == (s8 *)EOF)
         if (errno) error();
@@ -348,56 +345,62 @@ void i_ui(u8 bus)
         pc.r_acc = input[0];
 }
 
-void i_uo(u8 bus)
+static void i_uo(u8 bus)
 {
-    if (pc.flags & EMULATOR_DEPRECATED)
-        fprintf(stderr, "Deprecated UO at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
     printf("%d\n", pc.r_acc);
 }
 
-void i_uoc(u8 bus)
+static void i_uoc(u8 bus)
 {
-    if (pc.flags & EMULATOR_DEPRECATED)
-        fprintf(stderr, "Deprecated UOC at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
     putchar(pc.r_acc);
 }
 
-void i_uocr(u8 bus)
+static void i_uocr(u8 bus)
 {
-    if (pc.flags & EMULATOR_DEPRECATED)
-        fprintf(stderr, "Deprecated UOCR at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
     putchar(pc.r_acc);
     putchar('\n');
 }
 
-void i_prw(u8 bus)
+static void i_prw(u8 bus)
 {
     pc.m_ports[bus] = pc.r_acc;
 }
 
-void i_prr(u8 bus)
+static void i_prr(u8 bus)
 {
     pc.r_acc = pc.m_ports[bus];
 }
 
-void i_halt(u8 bus)
+static void i_halt(u8 bus)
 {
     pc.r_flags |= F_HALTED;
     emulator_finish();
 }
 
-void i_not_implemented(u8 bus)
+static void i_not_implemented(u8 bus)
 {
     fprintf(stderr, "Unimplemented instruction at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
 }
 
-void i_not_exist(u8 bus)
+static void i_not_exist(u8 bus)
 {
     die(1, "Non-existent instruction at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
 }
 
-instruction select_instruction(u8 opcode)
+static instruction select_instruction(u8 opcode)
 {
+    if (pc.flags & EMULATOR_DEPRECATED)
+        switch (opcode)
+        {
+        case 48:
+        case 49:
+        case 50:
+        case 51:
+            fprintf(
+                stderr, "Deprecated %s at 0x%02X%02X\n",
+                emulator_strinstruction(opcode), pc.r_rp, pc.r_pc
+            );
+        }
     switch (opcode)
     {
         case 0:
