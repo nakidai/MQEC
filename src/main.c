@@ -12,7 +12,10 @@
 static struct option long_options[] =
 {
     {"help", no_argument,    NULL, 'h'},
-    {"verbose", no_argument, NULL, 'v'},
+    {"load-info", no_argument, NULL, 'l'},
+    {"deprecated", no_argument, NULL, 'd'},
+    {"debug", no_argument, NULL, 'D'},
+    {"pause", no_argument, NULL, 'p'},
     {0}
 };
 
@@ -21,13 +24,16 @@ void usage(bool full)
     if (full)
         die(
             1,
-            "usage: %s [-h] file\n"
+            "usage: %s [-hvdDp] file\n"
             "Executes .mqa files (compiled code for MQ CPU)\n"
             "Arguments:\n"
-            "  file           file to execute\n"
+            "  file              file to execute\n"
             "Options:\n"
-            "  -h, --help     show this help message and quit\n"
-            "  -v, --verbose  show additional information\n",
+            "  -h, --help        show this help message and quit\n"
+            "  -l, --load-info   show information when loading code\n"
+            "  -d, --deprecated  show deprecated warnings\n"
+            "  -D, --debug       show computer status every tick\n"
+            "  -p, --pause       pause after every tick (press enter)\n",
             program_name
         );
     else
@@ -44,12 +50,21 @@ int main(i32 argc, s8 **argv)
 
     u8  flags = 0;
     i32 ch;
-    while ((ch = getopt_long(argc, argv, "hv", long_options, NULL)) != -1)
+    while ((ch = getopt_long(argc, argv, "hldDp", long_options, NULL)) != -1)
     {
         switch (ch)
         {
-        case 'v':
+        case 'l':
             flags |= EMULATOR_VERBOSE;
+            break;
+        case 'd':
+            flags |= EMULATOR_DEPRECATED;
+            break;
+        case 'D':
+            flags |= EMULATOR_DEBUG;
+            break;
+        case 'p':
+            flags |= EMULATOR_PAUSE;
             break;
         case 'h':
             usage(true);

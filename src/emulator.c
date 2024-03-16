@@ -322,6 +322,9 @@ void i_ui(u8 bus, u8 data)
     s8 input[8] = {0};
     u8 is_number = true;
 
+    if (pc.flags & EMULATOR_DEPRECATED)
+        fprintf(stderr, "Deprecated UI at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
+
     fgets(input, 8, stdin);
     if (input[0] == 0)
     {
@@ -346,16 +349,22 @@ void i_ui(u8 bus, u8 data)
 
 void i_uo(u8 bus, u8 data)
 {
+    if (pc.flags & EMULATOR_DEPRECATED)
+        fprintf(stderr, "Deprecated UO at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
     printf("%d\n", pc.r_acc);
 }
 
 void i_uoc(u8 bus, u8 data)
 {
+    if (pc.flags & EMULATOR_DEPRECATED)
+        fprintf(stderr, "Deprecated UOC at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
     putchar(pc.r_acc);
 }
 
 void i_uocr(u8 bus, u8 data)
 {
+    if (pc.flags & EMULATOR_DEPRECATED)
+        fprintf(stderr, "Deprecated UOCR at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
     putchar(pc.r_acc);
     putchar('\n');
 }
@@ -378,12 +387,12 @@ void i_halt(u8 bus, u8 data)
 
 void i_not_implemented(u8 bus, u8 data)
 {
-    fprintf(stderr, "Unimplemented instruction at %d\n", pc.r_pc);
+    fprintf(stderr, "Unimplemented instruction at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
 }
 
 void i_not_exist(u8 bus, u8 data)
 {
-    die(1, "Non-existent instruction at %d\n", pc.r_pc);
+    die(1, "Non-existent instruction at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
 }
 
 instruction select_instruction(u8 opcode)
@@ -499,6 +508,7 @@ void emulator_init(s8 *filename, u8 flags)
     pc.m_us     = calloc(STACK_SIZE, sizeof(pc.m_us));
     pc.m_cs     = calloc(STACK_SIZE, sizeof(pc.m_cs));
     pc.m_ports  = calloc(PORTS, sizeof(pc.m_ports));
+    if (errno) error();
 
     pc.flags    = flags;
     pc.filename = filename;
@@ -580,5 +590,20 @@ void emulator_run(void)
         select_instruction(opcode)(bus, data);
 
         ++pc.r_pc;
+
+        if (pc.flags & EMULATOR_DEBUG)
+            fprintf(
+                stderr,
+                "Instruction: %d|%d|%d(%s)\n"
+                "ACC: %02X PC:  %02X%02X\n"
+                "CS:  %02X US:  %02X\n"
+                "CP:  %02X Bus: %02X\n",
+                flag, data, opcode, emulator_strinstruction(opcode),
+                pc.r_acc, pc.r_rp, pc.r_pc,
+                pc.r_csp, pc.r_usp,
+                pc.r_cp, bus 
+            );
+        if (pc.flags & EMULATOR_PAUSE)
+            getchar();
     }
 }
