@@ -11,11 +11,11 @@
 
 static struct option long_options[] =
 {
-    {"help", no_argument,    NULL, 'h'},
-    {"load-info", no_argument, NULL, 'l'},
-    {"deprecated", no_argument, NULL, 'd'},
-    {"debug", no_argument, NULL, 'D'},
-    {"pause", no_argument, NULL, 'p'},
+    {"help",         no_argument, NULL, 'h'},
+    {"load-info",    no_argument, NULL, 'l'},
+    {"deprecated",   no_argument, NULL, 'd'},
+    {"debug",        no_argument, NULL, 'D'},
+    {"pause",        no_argument, NULL, 'p'},
     {0}
 };
 

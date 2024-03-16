@@ -320,12 +320,13 @@ void i_mulh(u8 bus)
 void i_ui(u8 bus)
 {
     s8 input[8] = {0};
-    u8 is_number = true;
+    bool is_number = true;
 
     if (pc.flags & EMULATOR_DEPRECATED)
         fprintf(stderr, "Deprecated UI at 0x%02X%02X\n", pc.r_rp, pc.r_pc);
 
-    fgets(input, 8, stdin);
+    if (fgets(input, 8, stdin) == (s8 *)EOF)
+        if (errno) error();
     if (input[0] == 0)
     {
         pc.r_acc = 0;
@@ -544,7 +545,7 @@ void emulator_read_instructions(void)
             die(1, "%s: Not a mqa executable\n", program_name);
         }
 
-        for (u16 i = 0; i < MEM_SIZE; ++i)
+        for (u16 i = 0;; ++i)
         {
             if ((high = fgetc(file)) == -1 || (low = fgetc(file)) == -1)
             {
@@ -567,6 +568,7 @@ void emulator_read_instructions(void)
                     emulator_strinstruction(pc.m_rom[i] & I_OPCODE),
                     (pc.m_rom[i] & I_ARG) >> I_ARG_OFF
                 );
+            if (i == 65535) break;
         }
     fclose(file);
 
