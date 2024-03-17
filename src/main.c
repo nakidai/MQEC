@@ -60,7 +60,7 @@ int main(i32 argc, s8 **argv)
         case 'w':
             flags |= EMULATOR_WARNING;
             break;
-        case 'D':
+        case 'd':
             flags |= EMULATOR_DEBUG;
             break;
         case 'p':
