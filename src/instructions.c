@@ -126,6 +126,8 @@ static void i_lsc(void)
     action = (_pc->r_acc << _bus) + ((_pc->r_flags & F_CARRY) >> F_CARRY_OFF);
     if (action & ~255)
         _pc->r_flags |= F_CARRY;
+    else
+        _pc->r_flags &= ~F_CARRY;
     _pc->r_acc = action & 255;
 }
 
@@ -135,6 +137,8 @@ static void i_rsc(void)
     _pc->r_acc = (_pc->r_acc >> _bus) + (((_pc->r_flags & F_CARRY) >> F_CARRY_OFF) << 7);
     if (((t >> _bus) << _bus) != t)
         _pc->r_flags |= F_CARRY;
+    else
+        _pc->r_flags &= ~F_CARRY;
 }
 
 static void i_cmp(void)
@@ -168,6 +172,8 @@ static void i_adc(void)
 
     if (action & ~255)
         _pc->r_flags |= F_CARRY;
+    else
+        _pc->r_flags &= ~F_CARRY;
     _pc->r_acc = action & 255;
 }
 
@@ -177,6 +183,8 @@ static void i_sbc(void)
 
     if (action & ~255)
         _pc->r_flags |= F_CARRY;
+    else
+        _pc->r_flags &= ~F_CARRY;
     _pc->r_acc = action & 255;
 }
 
@@ -185,6 +193,8 @@ static void i_inc(void)
     ++_pc->r_acc;
     if (_pc->r_acc == 0)
         _pc->r_flags |= F_CARRY;
+    else
+        _pc->r_flags &= ~F_CARRY;
 }
 
 static void i_dec(void)
@@ -192,6 +202,8 @@ static void i_dec(void)
     --_pc->r_acc;
     if (_pc->r_acc == 255)
         _pc->r_flags |= F_CARRY;
+    else
+        _pc->r_flags &= ~F_CARRY;
 }
 
 static void i_abs(void)
@@ -231,6 +243,8 @@ static void i_add(void)
 
     if (action & ~255)
         _pc->r_flags |= F_CARRY;
+    else
+        _pc->r_flags &= ~F_CARRY;
     _pc->r_acc = action & 255;
 }
 
@@ -240,6 +254,8 @@ static void i_sub(void)
 
     if (action & ~255)
         _pc->r_flags |= F_CARRY;
+    else
+        _pc->r_flags &= ~F_CARRY;
     _pc->r_acc = action & 255;
 }
 

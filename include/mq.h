@@ -26,13 +26,13 @@ typedef void (*instruction)();
 typedef struct mq
 {
     /* Registers     Description        */
-    u16 r_acc;    /* Accumulator        */
-    u16 r_pc;     /* Program Counter    */
-    u16 r_usp;    /* User Stack Pointer */
-    u16 r_csp;    /* Call Stack Pointer */
-    u16 r_rp;     /* ROM Page           */
-    u16 r_cp;     /* Cache Page         */
-    u16 r_flags;  /* Flags Register     */
+    u8  r_acc;    /* Accumulator        */
+    u8  r_pc;     /* Program Counter    */
+    u8  r_usp;    /* User Stack Pointer */
+    u8  r_csp;    /* Call Stack Pointer */
+    u8  r_rp;     /* ROM Page           */
+    u8  r_cp;     /* Cache Page         */
+    u8  r_flags;  /* Flags Register     */
 
     /* Memory        Length Description */
     u16 *m_rom;   /* 2^16   ROM         */
