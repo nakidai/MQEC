@@ -13,7 +13,15 @@
 #include "die.h"
 #include "mq.h"
 
+typedef struct __attribute__((packed)) mqa_header
+{
+    u32 cpu_version;
+    u16 include_size;
+    u32 code_size;
+} mqa_header;
+
 static mq pc = {0};
+static mqa_header header = {};
 
 void emulator_finish()
 {
@@ -56,30 +64,57 @@ void emulator_free(void)
     free(pc.m_ports);
 }
 
+void parse_header(FILE *file)
+{
+    if (fread(&header, 1, sizeof(header), file) != sizeof(header))
+    {
+        if (errno)
+            error();
+        else
+            die(1, "%s: Cannot read header\n", program_name);
+    }
+
+    if (pc.flags & EMULATOR_VERBOSE)
+        fprintf(
+            stderr,
+            "Header:\n"
+            "  MQ Version:   %c%c%c%c\n"
+            "  Include size: %d\n"
+            "  Code size:    %d\n",
+            *((s8 *)&header), *(((s8 *)&header) + 1), *(((s8 *)&header) + 2), *(((s8 *)&header) + 3),
+            header.include_size,
+            header.code_size
+        );
+    if (pc.flags & EMULATOR_WARNING && header.include_size)
+        fputs(
+            "File has include section, which is not implemented yet\n",
+            stderr
+        );
+}
+
 void emulator_read_instructions(void)
 {
     if (pc.flags & EMULATOR_VERBOSE)
-        fputs("Loading the instructions...\n", stderr);
+        fprintf(stderr, "Loading %s...\n", pc.filename);
 
-    i32 size, high, low;
     FILE *file = fopen(pc.filename, "r");
     if (errno) error();
-        fseek(file, 0, SEEK_END);
-        size = ftell(file);
-        fseek(file, 0, SEEK_SET);
-        if (size > MEM_SIZE*2)
-        {
-            fclose(file);
-            die(1, "%s: File is larger than MQ can handle\n", program_name);
-        } else if (size & 1)
+        parse_header(file);
+        if (header.code_size & 1)
         {
             fclose(file);
             die(1, "%s: Not a mqa executable\n", program_name);
         }
+        if (pc.flags & EMULATOR_VERBOSE)
+            fputs("Offset Opcode  Arg\n", stderr);
+
+        /* fseek because modules (and imports too) are not implemented yet */
+        fseek(file, header.include_size, SEEK_CUR);
 
         for (u16 i = 0;; ++i)
         {
-            if ((high = fgetc(file)) == -1 || (low = fgetc(file)) == -1)
+            if (fread(pc.m_rom + i, 1, sizeof(*pc.m_rom), file) != sizeof(*pc.m_rom))
+            // if ((high = fgetc(file)) == -1 || (low = fgetc(file)) == -1)
             {
                 if (errno)
                 {
@@ -91,16 +126,16 @@ void emulator_read_instructions(void)
                     break;
                 }
             }
-            pc.m_rom[i] = (high << 8) + low;
+            // pc.m_rom[i] = (high << 8) + low;
             if (pc.flags & EMULATOR_VERBOSE)
                 fprintf(
                     stderr,
-                    (pc.m_rom[i] & I_FLAG) ? "0x%04X %-4s $0x%02X\n" : "0x%04X %-4s  0x%02X\n",
+                    (pc.m_rom[i] & I_FLAG) ? "0x%04X %-6s $0x%02X\n" : "0x%04X %-6s  0x%02X\n",
                     i,
                     emulator_strinstruction(pc.m_rom[i] & I_OPCODE),
                     (pc.m_rom[i] & I_ARG) >> I_ARG_OFF
                 );
-            if (i == 65535) break;
+            if (i == header.code_size) break;
         }
     fclose(file);
 

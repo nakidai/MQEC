@@ -314,19 +314,12 @@ static void i_halt(void)
     emulator_finish();
 }
 
-static void i_not_implemented(void)
-{
-    fprintf(stderr, "Unimplemented instruction at 0x%02X%02X\n", _pc->r_rp, _pc->r_pc);
-}
-
-static void i_not_exist(void)
-{
-    die(1, "Non-existent instruction at 0x%02X%02X\n", _pc->r_rp, _pc->r_pc);
-}
+static void i_int(void) {/* TODO: Make module system */}
 
 static instruction select_instruction(u8 opcode)
 {
-    if (_pc->flags & EMULATOR_DEPRECATED)
+    if (_pc->flags & EMULATOR_WARNING)
+    {
         switch (opcode)
         {
         case 48:
@@ -338,6 +331,16 @@ static instruction select_instruction(u8 opcode)
                 emulator_strinstruction(opcode), _pc->r_rp, _pc->r_pc
             );
         }
+
+        switch (opcode)
+        {
+        case 126:
+            fprintf(
+                stderr, "Not implemented %s at 0x%02X%02X\n",
+                emulator_strinstruction(opcode), _pc->r_rp, _pc->r_pc
+            );
+        }
+    }
     switch (opcode)
     {
     case 0:   return i_nop;
@@ -388,9 +391,9 @@ static instruction select_instruction(u8 opcode)
     case 112: return i_prw;
     case 113: return i_prr;
     /* ... */
-    case 126: return i_not_implemented;
+    case 126: return i_int;
     case 127: return i_halt;
-    default:  return i_not_exist;
+    default:  die(1, "Non-existent instruction at 0x%02X%02X\n", _pc->r_rp, _pc->r_pc);
     }
 }
 

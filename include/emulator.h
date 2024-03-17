@@ -4,8 +4,8 @@
 #include "types.h"
 
 #define EMULATOR_VERBOSE    0b00000001
-#define EMULATOR_DEPRECATED 0b00000010
-#define EMULATOR_DEBUG      0b00000100
+#define EMULATOR_DEBUG      0b00000010
+#define EMULATOR_WARNING    0b00000100
 #define EMULATOR_PAUSE      0b00001000
 
 void emulator_init(s8 *filename, u8 flags);
