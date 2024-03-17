@@ -160,6 +160,8 @@ void emulator_run(void)
         emulator_do_tick(&pc, opcode, bus);
 
         ++pc.r_pc;
+        if ((pc.flags & EMULATOR_WARNING) && (pc.r_pc == 0) && (opcode <= 2 || opcode >= 10))
+            fputs("PC overflow\n", stderr);
 
         if (pc.flags & EMULATOR_DEBUG)
             fprintf(
